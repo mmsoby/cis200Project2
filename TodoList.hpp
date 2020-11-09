@@ -41,7 +41,18 @@ public:
     void deleteByType();
     void deleteByStatus();
     
+    
     void addItem();
+    void editItem();
+    void merge(TodoList &iGoAtTheEnd);
+    
+    //Sorts
+    void sortPriority();
+    void sortDueDate();
+    void sortCreateDate();
+    
+    //Helper
+    bool isEmpty(list * x);
 };
 
 #endif /* TodoList_hpp */

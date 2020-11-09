@@ -34,16 +34,13 @@ int printMenu(){
     cout<<"Pick from these options:"<<endl;
     
     cout<<"0. Quit"<<endl;
-    cout<<"1. Add a task to the List"<<endl;
-    cout<<"2. Edit a task from the list"<<endl;
+    cout<<"1. Add"<<endl;
+    cout<<"2. Edit"<<endl;
     cout<<"3. Delete"<<endl;
     cout<<"4. Print"<<endl;
     cout<<"5. Sort"<<endl;
     cout<<"6. Merge"<<endl;
-    cout<<"7. Clone"<<endl;
-    cout<<"8. Make it 2D"<<endl;
-    cout<<"9. Make it 3D"<<endl;
-    cout<<"10. Input from a .csv"<<endl;
+    cout<<"7. Input from a .csv"<<endl;
     
     cin>>userInput;
     cout<<endl;
@@ -57,7 +54,9 @@ void handleSelection(int option){
         case 1:
             list1.addItem();
             break;
-            
+        case 2:
+            list1.editItem();
+            break;
         case 3:
             int deleteChoice;
             cout<<endl;
@@ -125,9 +124,44 @@ void handleSelection(int option){
             }
             break;
             
-        case 10:
+        case 5:
+        {
+            int sortType;
+            cout<<"How do you want to sort?"<<endl;
+            cout<<"1. Priority"<<endl;
+            cout<<"2. Due Date"<<endl;
+            cout<<"3. Create Date"<<endl;
+            cin>>sortType;
+            
+            switch(sortType){
+                case 1:{
+                    list1.sortPriority();
+                }
+                    break;
+                case 2:{
+                    list1.sortDueDate();
+                }
+                    break;
+                case 3:{
+                    list1.sortCreateDate();
+                }
+                    break;
+            }
+        }
+            break;
+        case 6:
+        {
+            //This option uses the copy constructor to copy the contents of list1(The main list used in the program) and put it into list2
+            TodoList list2(list1);
+            //Then list2 is copied to the end of list1 using the merge function.
+            list1.merge(list2);
+            //list2.printAll();
+        }
+            break;
+        case 7:
         {
             list1.readFile();
         }
+            break;
     }
 }

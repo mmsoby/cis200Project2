@@ -34,21 +34,77 @@ TodoList::TodoList(const TodoList &orig){
 }
 
 void TodoList::addItem(){
-    list * tail=head;
-    bool tailNotFound=true;
+    list * prev=head;
+    list * ptr=prev->next;
     
-    while(tailNotFound){
-        if(tail->next!=nullptr){
-            tail=tail->next;
+    while(true){
+        if(ptr==nullptr){
+            break;
         }
-        else{
-            tailNotFound=false;
-        }
+        prev=ptr;
+        ptr=ptr->next;
     }
     
-    tail->next=new list;
-    tail->next->next=nullptr;
-    tail->item.fillMe();
+    if(prev==head && isEmpty(head)){
+        head->item.fillMe();
+    }
+    else{
+        prev->next=new list;
+        prev->next->next=nullptr;
+        prev->next->item.fillMe();
+    }
+}
+
+bool TodoList::isEmpty(list * x){
+    return x->item.getTitle()=="Title" && x->item.getDescription()=="Description" ;
+}
+
+void TodoList::editItem(){
+    int idIn;
+    std::cout<<"Which item do you want to edit?(Enter the ID)"<<std::endl;
+    std::cin>>idIn;
+    
+    list * ptr=head;
+    std::cout<<std::endl;
+    while(ptr!=nullptr){
+        if(ptr->item.getId()==idIn){
+            break;
+        }
+        ptr=ptr->next;
+    }
+    
+    //Ask what to change and do it
+    std::string attributeToEdit, temp;
+    int tempInt;
+    std::cout<<"Which attribute do you want to edit?"<<std::endl;
+    std::cin.ignore();
+    getline(std::cin, attributeToEdit);
+    
+    if(attributeToEdit=="Title"){
+        std::cout<<"Enter the Title you want it to become:"<<std::endl;
+        getline(std::cin, temp);
+        ptr->item.setTitle(temp);
+    }else if(attributeToEdit=="Description"){
+        std::cout<<"Enter the Description you want it to become:"<<std::endl;
+        getline(std::cin, temp);
+        ptr->item.setDescription(temp);
+    }else if(attributeToEdit=="Priority"){
+        std::cout<<"Enter the Priority you want it to become:"<<std::endl;
+        std::cin>>tempInt;
+        ptr->item.setPriority(tempInt);
+    }else if(attributeToEdit=="Status"){
+        std::cout<<"Enter the Status you want it to become:"<<std::endl;
+        getline(std::cin, temp);
+        ptr->item.setStatus(temp);
+    }else if(attributeToEdit=="Due Date"){
+        std::cout<<"Enter the Due Date you want it to become:(Separated by spaces)"<<std::endl;
+        int month,day,year;
+        std::cin>>month>>day>>year;
+        ptr->item.setDueDate(month, day, year);
+    }
+    else{
+        std::cout<<"Invalid attribute"<<std::endl;
+    }
 }
 
 
@@ -78,17 +134,28 @@ void TodoList::readFile(){
     std::string lastModifiedIn;
     
     
-    list * tail=head;
-    bool tailNotFound=true;
+    list * prev=head;
+    list * ptr=prev->next;
     
-    while(tailNotFound){
-        if(tail->next!=nullptr){
-            tail=tail->next;
+    while(true){
+        if(ptr==nullptr){
+            break;
         }
-        else{
-            tailNotFound=false;
-        }
+        prev=ptr;
+        ptr=ptr->next;
     }
+    
+    list *tail=prev;
+    
+    if(prev==head && isEmpty(head)){
+        tail=head;
+    }
+    else{
+        prev->next=new list;
+        prev->next->next=nullptr;
+        tail=prev->next;
+    }
+    list * last=tail;
     
     while(!inFile.eof()){
         //Extract input
@@ -104,7 +171,7 @@ void TodoList::readFile(){
         std::getline(inFile,dueDateIn,',');
         std::getline(inFile,lastModifiedIn,'\n');
         
-        
+
         
         tail->item.setId(stoi(idIn));
         tail->item.setTitle(titleIn);
@@ -141,15 +208,16 @@ void TodoList::readFile(){
         std::getline(lastModifiedStream, year, ' ');
         tail->item.setLastModified2(stoi(month), stoi(day), stoi(year));
         
-        
         //Prepare next item
         tail->next=new list;
         tail->next->next=nullptr;
+        last=tail;
         tail=tail->next;
+        
     }
     
     //Set list end to nullptr
-    //tail->next=nullptr;
+    last->next=nullptr;
     
     inFile.close();
 }
@@ -170,7 +238,7 @@ void TodoList::printFile(){
     list *ptr=head;
     
     while(ptr!=nullptr){
-        if(ptr->next!=nullptr){
+        if(ptr!=nullptr){
             outFile<<std::endl;
             outFile<<ptr->item;
         }
@@ -184,7 +252,7 @@ void TodoList::printFile(){
 void TodoList::printAll(){
     list * ptr=head;
     std::cout<<std::endl;
-    while(ptr->next!=nullptr){
+    while(ptr!=nullptr){
         std::cout<<"ID: "<<ptr->item.getId()<<std::endl;
         std::cout<<"Title: "<<ptr->item.getTitle()<<std::endl;
         std::cout<<"Description: "<<ptr->item.getDescription()<<std::endl;
@@ -202,7 +270,7 @@ void TodoList::printAll(){
 void TodoList::printFilterPriority(int priorityIn){
     list * ptr=head;
     std::cout<<std::endl;
-    while(ptr->next!=nullptr){
+    while(ptr!=nullptr){
         if(ptr->item.getPriority()==priorityIn){
             std::cout<<"ID: "<<ptr->item.getId()<<std::endl;
             std::cout<<"Title: "<<ptr->item.getTitle()<<std::endl;
@@ -222,7 +290,7 @@ void TodoList::printFilterPriority(int priorityIn){
 void TodoList::printFilterType(std::string inputIn){
     list * ptr=head;
     std::cout<<std::endl;
-    while(ptr->next!=nullptr){
+    while(ptr!=nullptr){
         if(ptr->item.getTypeAsString()==inputIn){
             std::cout<<"ID: "<<ptr->item.getId()<<std::endl;
             std::cout<<"Title: "<<ptr->item.getTitle()<<std::endl;
@@ -293,7 +361,7 @@ void TodoList::deleteItem(){
         prev=ptr;
         ptr=ptr->next;
     }
-
+    
 }
 
 void TodoList::deleteByType(){
@@ -304,20 +372,20 @@ void TodoList::deleteByType(){
     list * ptr=head;
     list *prev=head;
     std::cout<<std::endl;
-    
-    //In case this is the only item in the list
-    if(ptr->item.getTypeAsString()==typeIn){
-        if(ptr->next!=nullptr){
-            list * oldHead=head;
-            head=head->next;
-            delete oldHead;
-        }
-        
-        Todo x;
-        ptr->item=x;
-        ptr->next=nullptr;
-    }
-    
+    /*
+     //In case this is the only item in the list
+     if(ptr->item.getTypeAsString()==typeIn){
+     if(ptr->next!=nullptr){
+     list * oldHead=head;
+     head=head->next;
+     delete oldHead;
+     }
+     
+     Todo x;
+     ptr->item=x;
+     ptr->next=nullptr;
+     }
+     */
     while(ptr!=nullptr){
         if(ptr->item.getTypeAsString()==typeIn){
             prev->next=ptr->next;
@@ -333,3 +401,115 @@ void TodoList::deleteByStatus(){
     
 }
 
+
+//Sorts
+void TodoList::sortPriority(){
+    list *outer=head;
+    list *inner=nullptr;
+    list *minIndex=nullptr;
+    
+    while(outer!=nullptr){
+        minIndex=outer;
+        inner=outer->next;
+        while(inner!=nullptr){
+            if(inner->item.getPriority()<minIndex->item.getPriority()){
+                minIndex=inner;
+            }
+            inner=inner->next;
+        }
+        Todo temp=outer->item;
+        outer->item=minIndex->item;
+        minIndex->item=temp;
+        
+        outer=outer->next;
+    }
+}
+
+void TodoList::sortDueDate(){
+    list *outer=head;
+    list *inner=nullptr;
+    list *minIndex=nullptr;
+    
+    while(outer!=nullptr){
+        minIndex=outer;
+        inner=outer->next;
+        while(inner!=nullptr){
+            if(inner->item.dueLessThan(minIndex->item)){
+                minIndex=inner;
+            }
+            inner=inner->next;
+        }
+        Todo temp=outer->item;
+        outer->item=minIndex->item;
+        minIndex->item=temp;
+        
+        outer=outer->next;
+    }
+}
+
+void TodoList::sortCreateDate(){
+    list *outer=head;
+    list *inner=nullptr;
+    list *minIndex=nullptr;
+    
+    while(outer!=nullptr){
+        minIndex=outer;
+        inner=outer->next;
+        while(inner!=nullptr){
+            if(inner->item.createLessThan(minIndex->item)){
+                minIndex=inner;
+            }
+            inner=inner->next;
+        }
+        Todo temp=outer->item;
+        outer->item=minIndex->item;
+        minIndex->item=temp;
+        
+        outer=outer->next;
+    }
+}
+
+
+void TodoList::merge(TodoList &iGoAtTheEnd){
+    list * prev=head;
+    list * ptr=prev->next;
+    
+    while(true){
+        if(ptr==nullptr){
+            break;
+        }
+        prev=ptr;
+        ptr=ptr->next;
+    }
+    
+    list *tail=prev;
+    
+    if(prev==head && isEmpty(head)){
+        tail=head;
+    }
+    else{
+        prev->next=new list;
+        prev->next->next=nullptr;
+        tail=prev->next;
+    }
+    list * last=tail;
+    
+    list *ptrNew=iGoAtTheEnd.head;
+    while(ptrNew!=nullptr){
+        tail->item=ptrNew->item;
+        tail->next=new list;
+        last=tail;
+        tail=tail->next;
+        tail->next=nullptr;
+        ptrNew=ptrNew->next;
+    }
+    
+    last->next=nullptr;
+    
+    list *traverse=head;
+    int i=0;
+    while(traverse!=nullptr){
+        traverse->item.setId(++i);
+        traverse=traverse->next;
+    }
+}

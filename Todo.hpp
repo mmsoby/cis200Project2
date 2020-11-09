@@ -84,7 +84,6 @@ public:
     
     //Overloaded Operators
     void operator=(const Todo &right);
-    
 
 };
 
