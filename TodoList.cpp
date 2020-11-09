@@ -133,6 +133,7 @@ void TodoList::readFile(){
     std::string dueDateIn;
     std::string lastModifiedIn;
     
+
     
     list * prev=head;
     list * ptr=prev->next;
@@ -252,6 +253,9 @@ void TodoList::printFile(){
 void TodoList::printAll(){
     list * ptr=head;
     std::cout<<std::endl;
+    if(isEmpty(ptr)){
+        return;
+    }
     while(ptr!=nullptr){
         std::cout<<"ID: "<<ptr->item.getId()<<std::endl;
         std::cout<<"Title: "<<ptr->item.getTitle()<<std::endl;
@@ -342,17 +346,24 @@ void TodoList::deleteItem(){
     while(ptr!=nullptr){
         if(ptr->item.getId()==idIn){
             if(ptr==head){
+                list * temp=head;
                 head=head->next;
+                delete temp;
                 break;
             }
             prev->next=ptr->next;
+            delete ptr;
             break;
         }
         prev=ptr;
         ptr=ptr->next;
     }
     
-    
+    //In case all items were deleted previously
+    if(head==nullptr){
+        head=new list;
+        head->next=nullptr;
+    }
 }
 
 void TodoList::deleteByType(){
@@ -368,13 +379,13 @@ void TodoList::deleteByType(){
         if(ptr->item.getTypeAsString()==typeIn){
             if(ptr==head){
                 head=head->next;
-                //delete ptr;
+                delete ptr;
                 ptr=head;
                 continue;
             }
             else{
                 prev->next=ptr->next;
-                //delete ptr;
+                delete ptr;
                 ptr=prev;
             }
         }
@@ -383,6 +394,11 @@ void TodoList::deleteByType(){
     }
     prev->next=nullptr;
     
+    //In case all items were deleted previously
+    if(head==nullptr){
+        head=new list;
+        head->next=nullptr;
+    }
 }
 
 void TodoList::deleteByStatus(){
@@ -398,13 +414,13 @@ void TodoList::deleteByStatus(){
         if(ptr->item.getStatusAsString()==statusIn){
             if(ptr==head){
                 head=head->next;
-                //delete ptr;
+                delete ptr;
                 ptr=head;
                 continue;
             }
             else{
                 prev->next=ptr->next;
-                //delete ptr;
+                delete ptr;
                 ptr=prev;
             }
         }
@@ -413,6 +429,11 @@ void TodoList::deleteByStatus(){
     }
     prev->next=nullptr;
     
+    //In case all items were deleted previously
+    if(head==nullptr){
+        head=new list;
+        head->next=nullptr;
+    }
 }
 //Sorts
 void TodoList::sortPriority(){
