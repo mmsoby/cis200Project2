@@ -171,7 +171,7 @@ void TodoList::readFile(){
         std::getline(inFile,dueDateIn,',');
         std::getline(inFile,lastModifiedIn,'\n');
         
-
+        
         
         tail->item.setId(stoi(idIn));
         tail->item.setTitle(titleIn);
@@ -334,33 +334,24 @@ void TodoList::deleteItem(){
     int idIn;
     std::cout<<"Which item do you want to delete?(Enter its Id)"<<std::endl;
     std::cin>>idIn;
+    std::cout<<std::endl;
     
     list * ptr=head;
     list *prev=head;
-    std::cout<<std::endl;
     
-    //In case this is the only item in the list
-    if(ptr->item.getId()==idIn){
-        if(ptr->next!=nullptr){
-            list * oldHead=head;
-            head=head->next;
-            delete oldHead;
-        }
-        
-        Todo x;
-        ptr->item=x;
-        ptr->next=nullptr;
-    }
-    
-    while(ptr->next!=nullptr){
+    while(ptr!=nullptr){
         if(ptr->item.getId()==idIn){
+            if(ptr==head){
+                head=head->next;
+                break;
+            }
             prev->next=ptr->next;
-            delete ptr;
             break;
         }
         prev=ptr;
         ptr=ptr->next;
     }
+    
     
 }
 
@@ -368,40 +359,61 @@ void TodoList::deleteByType(){
     std::string typeIn;
     std::cout<<"Which type of item do you want to delete?"<<std::endl;
     std::cin>>typeIn;
-    
-    list * ptr=head;
-    list *prev=head;
     std::cout<<std::endl;
-    /*
-     //In case this is the only item in the list
-     if(ptr->item.getTypeAsString()==typeIn){
-     if(ptr->next!=nullptr){
-     list * oldHead=head;
-     head=head->next;
-     delete oldHead;
-     }
-     
-     Todo x;
-     ptr->item=x;
-     ptr->next=nullptr;
-     }
-     */
+    
+    list *ptr=head;
+    list *prev=ptr;
+    
     while(ptr!=nullptr){
         if(ptr->item.getTypeAsString()==typeIn){
-            prev->next=ptr->next;
-            delete ptr;
-            ptr=prev;
+            if(ptr==head){
+                head=head->next;
+                //delete ptr;
+                ptr=head;
+                continue;
+            }
+            else{
+                prev->next=ptr->next;
+                //delete ptr;
+                ptr=prev;
+            }
         }
         prev=ptr;
         ptr=ptr->next;
     }
-}
-
-void TodoList::deleteByStatus(){
+    prev->next=nullptr;
     
 }
 
-
+void TodoList::deleteByStatus(){
+    std::string statusIn;
+    std::cout<<"Which status of item do you want to delete?"<<std::endl;
+    std::cin>>statusIn;
+    std::cout<<std::endl;
+    
+    list *ptr=head;
+    list *prev=ptr;
+    
+    while(ptr!=nullptr){
+        if(ptr->item.getStatusAsString()==statusIn){
+            if(ptr==head){
+                head=head->next;
+                //delete ptr;
+                ptr=head;
+                continue;
+            }
+            else{
+                prev->next=ptr->next;
+                //delete ptr;
+                ptr=prev;
+            }
+        }
+        prev=ptr;
+        ptr=ptr->next;
+    }
+    prev->next=nullptr;
+    
+}
 //Sorts
 void TodoList::sortPriority(){
     list *outer=head;
