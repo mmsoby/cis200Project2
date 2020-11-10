@@ -52,6 +52,7 @@ void TodoList::addItem(){
         prev->next=new list;
         prev->next->next=nullptr;
         prev->next->item.fillMe();
+        prev->next->item.setId(prev->item.getId()+1);
     }
 }
 
